@@ -29,7 +29,6 @@ import java.util.Objects;
 
 import com.google.protobuf.ByteString;
 
-import org.apache.tez.dag.api.TezConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -51,12 +50,6 @@ import org.xerial.snappy.SnappyOutputStream;
 public class TezUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(TezUtils.class);
-
-  /**
-   * We want to load tez and hadoop configs from local xml files so we can
-   * build input/output processor configs on top of it
-   */
-  private static final Configuration localTezConfig = new TezConfiguration();
 
   /**
    * Allows changing the log level for task / AM logging. </p>
@@ -118,7 +111,7 @@ public class TezUtils {
     Objects.requireNonNull(byteString, "ByteString must be specified");
     try(SnappyInputStream uncompressIs = new SnappyInputStream(byteString.newInput());) {
       DAGProtos.ConfigurationProto confProto = DAGProtos.ConfigurationProto.parseFrom(uncompressIs);
-      Configuration conf = new Configuration(localTezConfig);
+      Configuration conf = new Configuration(false);
       readConfFromPB(confProto, conf);
       return conf;
     }
