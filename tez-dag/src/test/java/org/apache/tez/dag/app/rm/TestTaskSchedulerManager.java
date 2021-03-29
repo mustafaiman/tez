@@ -123,37 +123,6 @@ public class TestTaskSchedulerManager {
       events.add(event);
     }
   }
-  
-  class MockTaskSchedulerManager extends TaskSchedulerManager {
-
-    final AtomicBoolean notify = new AtomicBoolean(false);
-    
-    public MockTaskSchedulerManager(AppContext appContext,
-                                    DAGClientServer clientService, EventHandler eventHandler,
-                                    ContainerSignatureMatcher containerSignatureMatcher,
-                                    WebUIService webUI) {
-      super(appContext, clientService, eventHandler, containerSignatureMatcher, webUI,
-          Lists.newArrayList(new NamedEntityDescriptor("FakeDescriptor", null)), false,
-          new HadoopShimsLoader(appContext.getAMConf()).getHadoopShim());
-    }
-
-    @Override
-    protected void instantiateSchedulers(String host, int port, String trackingUrl,
-                                         AppContext appContext) {
-      taskSchedulers[0] = new TaskSchedulerWrapper(mockTaskScheduler);
-      taskSchedulerServiceWrappers[0] =
-          new ServicePluginLifecycleAbstractService<>(taskSchedulers[0].getTaskScheduler());
-    }
-    
-    @Override
-    protected void notifyForTest() {
-      synchronized (notify) {
-        notify.set(true);
-        notify.notifyAll();
-      }
-    }
-    
-  }
 
   AppContext mockAppContext;
   DAGClientServer mockClientService;
@@ -176,7 +145,7 @@ public class TestTaskSchedulerManager {
     mockWebUIService = mock(WebUIService.class);
     when(mockAppContext.getAllContainers()).thenReturn(mockAMContainerMap);
     when(mockClientService.getBindAddress()).thenReturn(new InetSocketAddress(10000));
-    schedulerHandler = new MockTaskSchedulerManager(
+    schedulerHandler = new MockTaskSchedulerManager(mockTaskScheduler,
         mockAppContext, mockClientService, mockEventHandler, mockSigMatcher, mockWebUIService);
   }
 

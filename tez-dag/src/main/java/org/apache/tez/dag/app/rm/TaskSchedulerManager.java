@@ -264,7 +264,7 @@ public class TaskSchedulerManager extends AbstractService implements
             .build());
   }
 
-  public synchronized void handleEvent(AMSchedulerEvent sEvent) {
+  public void handleEvent(AMSchedulerEvent sEvent) {
     LOG.debug("Processing the event {}", sEvent);
     switch (sEvent.getType()) {
     case S_TA_LAUNCH_REQUEST:
